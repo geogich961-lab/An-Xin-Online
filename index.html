@@ -890,10 +890,19 @@ $('doneBtn').addEventListener('click', () => {
   box.focus({ preventScroll: true });
 });
 
-fetch('api/content', { headers: { Accept: 'application/json' } })
-  .then((response) => response.ok ? response.json() : null)
-  .then((content) => { if (content) applyPageContent(content); })
-  .catch(() => {});
+let localPreviewContent = null;
+try {
+  localPreviewContent = JSON.parse(localStorage.getItem('anxin_site_content_v1') || 'null');
+} catch {}
+
+if (localPreviewContent?.recipient && Array.isArray(localPreviewContent.menu) && localPreviewContent.text) {
+  applyPageContent(localPreviewContent);
+} else {
+  fetch('api/content', { headers: { Accept: 'application/json' } })
+    .then((response) => response.ok ? response.json() : null)
+    .then((content) => { if (content) applyPageContent(content); })
+    .catch(() => {});
+}
 </script>
 </body>
 </html>
