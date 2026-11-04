@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#eef5ff">
+<title>Quản trị nội dung · Xin Một Bữa</title>
+<style>
+:root{color-scheme:light;--ink:#14275e;--muted:#65749c;--blue:#2a5beb;--line:#d7e3f5;--paper:#fff;--bg:#f2f6fc;--gold:#ffc83d;--red:#a52d36;--green:#17794f}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif}.shell{width:min(980px,100% - 32px);margin:0 auto;padding:32px 0 64px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}.brand{font-size:1.4rem;font-weight:800}.sub{color:var(--muted);margin:2px 0 0}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;margin:16px 0;box-shadow:0 8px 24px #18356b0a}.card h2{font-size:1.18rem;margin:0 0 4px}.card>p{color:var(--muted);margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label,.check label{font-weight:650}.field small{color:var(--muted)}input,textarea{width:100%;font:inherit;color:var(--ink);border:1px solid #c8d5e9;border-radius:10px;padding:11px 12px;background:#fff}textarea{min-height:92px;resize:vertical}input:focus,textarea:focus{outline:3px solid #2a5beb2a;border-color:var(--blue)}.span2{grid-column:1/-1}.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.button{appearance:none;border:0;border-radius:999px;padding:11px 18px;background:var(--blue);color:white;font:inherit;font-weight:700;font-size:.95rem;cursor:pointer}.button.secondary{background:#e8effd;color:var(--ink)}.button.danger{background:#fff0f0;color:var(--red)}.button:disabled{opacity:.55;cursor:wait}.status{min-height:1.6em;color:var(--muted)}.status.good{color:var(--green)}.status.bad{color:var(--red)}.menu-item{border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}.menu-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.menu-head strong{font-size:1rem}.check{display:flex;align-items:center;gap:10px;margin-top:16px}.check input{width:18px;height:18px;accent-color:var(--blue)}.login{max-width:420px;margin:10vh auto}.hidden{display:none!important}.sticky{position:sticky;bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fffffff0;backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:0 6px 20px #18356b1a;border-radius:16px;padding:12px 16px}.hint{font-size:.86rem;color:var(--muted)}@media(max-width:640px){.shell{width:min(100% - 22px,980px);padding-top:18px}.card{padding:18px}.grid{grid-template-columns:1fr}.span2{grid-column:auto}.top{align-items:flex-start}.sticky{align-items:flex-start;flex-direction:column}.sticky .actions{width:100%}.sticky .button{flex:1}.login{margin-top:8vh}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="top"><div><div class="brand">Quản trị · Xin Một Bữa</div><p class="sub">Cập nhật nội dung trang và thông tin chuyển khoản.</p></div><a href="./" target="_blank" rel="noopener">Mở trang chính ↗</a></header>
+
+  <section id="loginPanel" class="card login hidden">
+    <h2>Đăng nhập quản trị</h2><p>Dùng mật khẩu được thiết lập trong cấu hình Cloudflare.</p>
+    <form id="loginForm" class="field"><label for="password">Mật khẩu quản trị</label><input id="password" type="password" autocomplete="current-password" required><div class="actions"><button class="button" type="submit">Đăng nhập</button></div><div id="loginStatus" class="status" role="status" aria-live="polite"></div></form>
+  </section>
+  <section id="demoPanel" class="card login">
+    <h2>Bản thử không cần backend</h2>
+    <p>Chỉnh nội dung và xem kết quả trên cùng trình duyệt. Dữ liệu chỉ lưu cục bộ, không đăng nhập và không ảnh hưởng khách truy cập khác.</p>
+    <div class="actions"><button id="useLocalMode" class="button" type="button">Mở admin bản thử</button><span class="hint">Dùng localStorage · không cần SQL</span></div>
+  </section>
+
+  <section id="editor" class="hidden" aria-label="Trình chỉnh sửa nội dung">
+    <div class="card"><h2>Tài khoản nhận tiền</h2><p>Thông tin này được đưa vào mã QR VietQR động.</p><div class="grid">
+      <div class="field"><label for="bankName">Ngân hàng</label><input id="bankName" required></div>
+      <div class="field"><label for="bankBin">Mã BIN ngân hàng (6 chữ số)</label><input id="bankBin" inputmode="numeric" maxlength="6" required></div>
+      <div class="field"><label for="accountName">Tên người nhận</label><input id="accountName" required></div>
+      <div class="field"><label for="accountNo">Số tài khoản</label><input id="accountNo" required></div>
+    </div></div>
+    <div class="card"><h2>Thực đơn và số tiền</h2><p>Thêm, xóa hoặc sửa món. Nội dung chuyển khoản chỉ dùng chữ không dấu, số và khoảng trắng (tối đa 50 ký tự).</p><div id="menuItems"></div><button id="addMenuItem" class="button secondary" type="button">+ Thêm món</button>
+      <div class="grid" style="margin-top:20px"><div class="field"><label for="customAmount">Số tiền tùy tâm mặc định (đồng)</label><input id="customAmount" type="number" min="1000" step="1000" required></div><div class="field"><label for="customMemo">Nội dung chuyển khoản cho tùy tâm</label><input id="customMemo" maxlength="50" required></div></div>
+    </div>
+    <div class="card"><h2>Nội dung trên trang chính</h2><p>Các trường dưới đây cập nhật nội dung hiển thị, tiêu đề trang và thông tin chia sẻ.</p><div id="textFields" class="grid"></div></div>
+    <div class="card"><label class="check"><input id="showSampleNotice" type="checkbox"><span>Hiện thông báo nhắc kiểm tra thông tin tài khoản mẫu</span></label><p class="hint">Tắt nếu đây là tài khoản chính chủ và bạn đã xác nhận nội dung.</p></div>
+    <div class="sticky"><div><strong>Lưu thay đổi</strong><div id="saveStatus" class="status" role="status" aria-live="polite">Chưa lưu thay đổi</div></div><div class="actions"><button id="logout" class="button secondary" type="button">Đăng xuất</button><button id="save" class="button" type="button">Lưu và cập nhật trang</button></div></div>
+  </section>
+</main>
+<script src="./admin-defaults.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const textGroups = [
+  ['Thông tin trang', [['siteTitle','Tiêu đề trang'],['metaDescription','Mô tả trang'],['brand','Tên thương hiệu'],['tagline','Câu giới thiệu ngắn']]],
+  ['Phần mở đầu', [['heroEyebrow','Dòng nhãn'],['heroTitle','Tiêu đề'],['heroSlogan','Khẩu hiệu'],['heroLead','Đoạn giới thiệu'],['heroAside','Chữ ký ngắn'],['stamp','Con dấu'],['inviteButton','Nút mời ăn'],['vowButton','Nút lời hứa'],['bowlCaption','Chú thích hình minh họa']]],
+  ['Thực đơn và chuyển khoản', [['menuEyebrow','Nhãn thực đơn'],['menuTitle','Tiêu đề thực đơn'],['menuLead','Mô tả thực đơn'],['customName','Tên mục tùy tâm'],['customNote','Mô tả mục tùy tâm'],['bankLabel','Nhãn ngân hàng'],['holderLabel','Nhãn người nhận'],['accountLabel','Nhãn số tài khoản'],['amountLabel','Nhãn số tiền'],['memoLabel','Nhãn nội dung chuyển khoản'],['copyLabel','Nhãn nút sao chép'],['copySuccess','Thông báo sao chép thành công'],['sampleMessage','Thông báo tài khoản mẫu']]],
+  ['Lời cảm ơn', [['paidButton','Nút xác nhận đã chuyển'],['paidHint','Hướng dẫn sau khi chuyển'],['thanksSign','Chữ ký cảm ơn'],['shareThanks','Nút chia sẻ'],['revisitMenu','Nút xem lại thực đơn'],['thanks100Title','Tiêu đề cảm ơn từ 100.000đ'],['thanks100Body','Lời cảm ơn từ 100.000đ · dùng {amount} để chèn số tiền'],['thanks100Vow','Lời hứa từ 100.000đ'],['thanks50Title','Tiêu đề cảm ơn từ 50.000đ'],['thanks50Body','Lời cảm ơn từ 50.000đ · dùng {amount} để chèn số tiền'],['thanks50Vow','Lời hứa từ 50.000đ'],['thanks20Title','Tiêu đề cảm ơn từ 20.000đ'],['thanks20Body','Lời cảm ơn từ 20.000đ · dùng {amount} để chèn số tiền'],['thanks20Vow','Lời hứa từ 20.000đ'],['thanks1Title','Tiêu đề cảm ơn từ 1.000đ'],['thanks1Body','Lời cảm ơn từ 1.000đ · dùng {amount} để chèn số tiền'],['thanks1Vow','Lời hứa từ 1.000đ']]],
+  ['Lời hứa và hóa đơn', [['vowEyebrow','Nhãn phần lời hứa'],['vowTitle','Tiêu đề lời hứa'],['promise1Title','Lời hứa 1 · tiêu đề'],['promise1Body','Lời hứa 1 · nội dung'],['promise2Title','Lời hứa 2 · tiêu đề'],['promise2Body','Lời hứa 2 · nội dung'],['promise3Title','Lời hứa 3 · tiêu đề'],['promise3Body','Lời hứa 3 · nội dung'],['receiptTitle','Tiêu đề hóa đơn'],['receiptMeta','Mô tả hóa đơn'],['receiptThanks','Dòng lời cảm ơn'],['receiptSmile','Dòng nụ cười'],['receiptGood','Dòng việc tốt'],['receiptTotal','Nhãn tổng tiền'],['receiptFoot','Chân hóa đơn']]],
+  ['Trợ giúp, hỏi đáp và chân trang', [['helpEyebrow','Nhãn phần trợ giúp'],['helpTitle','Tiêu đề trợ giúp'],['help1Title','Cách giúp 1 · tiêu đề'],['help1Body','Cách giúp 1 · nội dung'],['shareButton','Nút sao chép đường dẫn'],['help2Title','Cách giúp 2 · tiêu đề'],['help2Body','Cách giúp 2 · nội dung'],['help3Title','Cách giúp 3 · tiêu đề'],['help3Body','Cách giúp 3 · nội dung'],['faqEyebrow','Nhãn câu hỏi thường gặp'],['faqTitle','Tiêu đề câu hỏi thường gặp'],['faq1Question','Câu hỏi 1'],['faq1Answer','Trả lời 1'],['faq2Question','Câu hỏi 2'],['faq2Answer','Trả lời 2'],['faq3Question','Câu hỏi 3'],['faq3Answer','Trả lời 3'],['faq4Question','Câu hỏi 4'],['faq4Answer','Trả lời 4'],['footerNote','Lời chào chân trang'],['footerLine','Dòng chân trang'],['copyright','Thông tin bản quyền']]]
+];
+let current = null;
+let itemNumber = 0;
+let storageMode = 'backend';
+const LOCAL_CONTENT_KEY = 'anxin_site_content_v1';
+
+function showStatus(el, message, type='') { el.textContent = message; el.className = `status ${type}`; }
+function field(key, label, value='', multiline=false) {
+  const wrap = document.createElement('div'); wrap.className = 'field';
+  if (multiline) wrap.classList.add('span2');
+  const input = document.createElement(multiline ? 'textarea' : 'input');
+  input.id = `text-${key}`; input.dataset.key = key; input.value = value;
+  const caption = document.createElement('label'); caption.htmlFor = input.id; caption.textContent = label;
+  wrap.append(caption, input); return wrap;
+}
+function renderTextFields(text) {
+  const host = $('textFields'); host.replaceChildren();
+  for (const [heading, items] of textGroups) {
+    const title = document.createElement('h3'); title.textContent = heading; title.className = 'span2'; title.style.margin = '18px 0 0'; host.appendChild(title);
+    for (const [key,label] of items) host.appendChild(field(key,label,text[key], text[key].length > 110));
+  }
+}
+function addMenuItem(item={id:`mon-${Date.now()}-${++itemNumber}`,name:'',amount:1000,note:'',memo:''}) {
+  const host = $('menuItems'); const card = document.createElement('article'); card.className='menu-item'; card.dataset.menuItem='';
+  const head=document.createElement('div');head.className='menu-head';const title=document.createElement('strong');title.textContent='Món chuyển khoản';const remove=document.createElement('button');remove.type='button';remove.className='button danger';remove.textContent='Xóa món';remove.addEventListener('click',()=>card.remove());head.append(title,remove);
+  const grid=document.createElement('div');grid.className='grid';
+  const controls=[['name','Tên món','text'],['amount','Số tiền (đồng)','number'],['note','Mô tả món','textarea'],['memo','Nội dung chuyển khoản','text']];
+  for(const [key,label,type] of controls){const wrapper=document.createElement('div');wrapper.className='field';if(key==='note')wrapper.classList.add('span2');const caption=document.createElement('label');caption.textContent=label;const input=document.createElement(type==='textarea'?'textarea':'input');input.dataset.menuField=key;input.value=item[key] ?? '';if(type==='number'){input.type='number';input.min='1000';input.step='1000';input.required=true}if(key==='memo')input.maxLength=50;caption.htmlFor=`menu-${item.id}-${key}`;input.id=caption.htmlFor;wrapper.append(caption,input);grid.appendChild(wrapper)}
+  const hidden=document.createElement('input');hidden.type='hidden';hidden.dataset.menuId='';hidden.value=item.id;card.append(head,grid,hidden);host.appendChild(card);
+}
+function populate(data) {
+  current=data;
+  for(const [id,value] of Object.entries(data.recipient)) $(id).value=value;
+  $('customAmount').value=data.customAmount;$('customMemo').value=data.customMemo;$('showSampleNotice').checked=data.showSampleNotice;
+  $('menuItems').replaceChildren();data.menu.forEach(addMenuItem);renderTextFields(data.text);
+}
+async function api(path, options={}) {
+  const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});
+  const data=await response.json().catch(()=>({error:'Phản hồi máy chủ không hợp lệ.'}));
+  if(!response.ok)throw new Error(data.error||'Không thể hoàn tất yêu cầu.');return data;
+}
+async function loadEditor() {
+  const session=await api('/api/admin/session');
+  if(!session.authenticated){$('loginPanel').classList.remove('hidden');return}
+  const data=await api('/api/admin/content');storageMode='backend';populate(data);
+  $('loginPanel').classList.add('hidden');$('demoPanel').classList.add('hidden');$('editor').classList.remove('hidden');$('save').textContent='Lưu và cập nhật trang';
+}
+function collect() {
+  const text={};document.querySelectorAll('#textFields [data-key]').forEach(input=>text[input.dataset.key]=input.value.trim());
+  const menu=Array.from(document.querySelectorAll('[data-menu-item]')).map(card=>({id:card.querySelector('[data-menu-id]').value,name:card.querySelector('[data-menu-field="name"]').value.trim(),amount:Number(card.querySelector('[data-menu-field="amount"]').value),note:card.querySelector('[data-menu-field="note"]').value.trim(),memo:card.querySelector('[data-menu-field="memo"]').value.trim()}));
+  return {recipient:{bankName:$('bankName').value.trim(),bankBin:$('bankBin').value.trim(),accountName:$('accountName').value.trim(),accountNo:$('accountNo').value.trim()},customAmount:Number($('customAmount').value),customMemo:$('customMemo').value.trim(),showSampleNotice:$('showSampleNotice').checked,menu,text};
+}
+function validateLocalContent(data) {
+  if(!data.recipient.bankName||!data.recipient.accountName||!/^[0-9]{6}$/.test(data.recipient.bankBin)||!/^[A-Za-z0-9]{4,19}$/.test(data.recipient.accountNo))return 'Kiểm tra lại ngân hàng, mã BIN, tên người nhận và số tài khoản.';
+  if(!Number.isSafeInteger(data.customAmount)||data.customAmount<1000||data.customAmount>9999999999999)return 'Số tiền tùy tâm phải từ 1.000đ đến tối đa 13 chữ số.';
+  if(!/^[A-Za-z0-9 ]{1,50}$/.test(data.customMemo))return 'Nội dung tùy tâm chỉ dùng chữ không dấu, số và khoảng trắng, tối đa 50 ký tự.';
+  if(data.menu.length<1||data.menu.length>12||new Set(data.menu.map(item=>item.id)).size!==data.menu.length)return 'Thực đơn cần có từ 1 đến 12 món, mỗi món có mã riêng.';
+  for(const item of data.menu){if(!item.name||!item.note||!Number.isSafeInteger(item.amount)||item.amount<1000||item.amount>9999999999999||!/^[A-Za-z0-9 ]{1,50}$/.test(item.memo))return 'Kiểm tra tên, mô tả, số tiền và nội dung chuyển khoản của từng món.'}
+  if(Object.keys(window.ANXIN_DEFAULT_CONTENT.text).some(key=>!data.text[key]||data.text[key].length>2000))return 'Hãy điền đầy đủ các trường nội dung (tối đa 2.000 ký tự mỗi trường).';
+  return null;
+}
+function startLocalMode() {
+  storageMode='local';
+  let data;
+  try{data=JSON.parse(localStorage.getItem(LOCAL_CONTENT_KEY)||'null')}catch{}
+  if(!isLocalContent(data))data=JSON.parse(JSON.stringify(window.ANXIN_DEFAULT_CONTENT));
+  populate(data);
+  $('loginPanel').classList.add('hidden');$('demoPanel').classList.add('hidden');$('editor').classList.remove('hidden');
+  $('save').textContent='Lưu bản thử trên thiết bị này';
+  showStatus($('saveStatus'),'Chế độ thử: dữ liệu chỉ lưu trong trình duyệt này.','');
+}
+function isLocalContent(data) {
+  return !!data&&!!data.recipient&&!!data.text&&Array.isArray(data.menu)&&Object.keys(window.ANXIN_DEFAULT_CONTENT.text).every(key=>typeof data.text[key]==='string')&&['bankName','bankBin','accountName','accountNo'].every(key=>typeof data.recipient[key]==='string');
+}
+$('useLocalMode').addEventListener('click',startLocalMode);
+$('loginForm').addEventListener('submit',async(event)=>{event.preventDefault();const status=$('loginStatus');showStatus(status,'Đang đăng nhập…');try{await api('/api/admin/session',{method:'POST',body:JSON.stringify({password:$('password').value})});$('password').value='';await loadEditor()}catch(error){showStatus(status,error.message,'bad')}});
+$('addMenuItem').addEventListener('click',()=>addMenuItem());
+$('save').addEventListener('click',async()=>{const button=$('save');const status=$('saveStatus');button.disabled=true;showStatus(status,'Đang lưu…');try{const data=collect();if(storageMode==='local'){const error=validateLocalContent(data);if(error)throw new Error(error);localStorage.setItem(LOCAL_CONTENT_KEY,JSON.stringify(data));showStatus(status,'Đã lưu bản thử. Mở lại trang chính trong trình duyệt này để xem thay đổi.','good')}else{const result=await api('/api/admin/content',{method:'PUT',body:JSON.stringify(data)});showStatus(status,`Đã lưu lúc ${new Date(result.updatedAt).toLocaleString('vi-VN')}. Trang chính sẽ nhận nội dung mới sau tối đa 30 giây khi tải lại.`,'good')}}catch(error){showStatus(status,error.message||'Không lưu được dữ liệu trong trình duyệt.','bad')}finally{button.disabled=false}});
+$('logout').addEventListener('click',async()=>{if(storageMode==='local'){$('editor').classList.add('hidden');$('demoPanel').classList.remove('hidden');return}try{await api('/api/admin/session',{method:'DELETE')}finally{$('editor').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('demoPanel').classList.remove('hidden')}});
+loadEditor().catch(()=>{$('loginPanel').classList.remove('hidden');showStatus($('loginStatus'),'Không kết nối được backend. GitHub Pages chỉ chạy trang tĩnh; để dùng admin cần triển khai Pages Functions và D1 trên Cloudflare.','bad')});
+</script>
+</body>
+</html>
