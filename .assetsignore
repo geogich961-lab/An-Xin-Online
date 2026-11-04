@@ -1,0 +1,5 @@
+/functions/
+/migrations/
+/wrangler.toml
+/.assetsignore
+/SETUP-admin.md

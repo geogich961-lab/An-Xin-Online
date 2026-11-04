@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Xin Một Bữa Cơm</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playpen+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: một cột rộng, mở đầu bằng chiếc bát sứ men lam; thực đơn "mời mình ăn" -> thông tin chuyển khoản -> hóa đơn niềm vui -> lời hứa -> hỏi đáp. */
+:root {
+  --bg: #F2F8FF;
+  --sky: #CDE6FF;
+  --surface: #FFFFFF;
+  --fg: #14275E;
+  --muted: #51638F;
+  --line: #CFE0F7;
+  --cobalt: #2A5BEB;
+  --cobalt-soft: #DCEBFF;
+  --on-cobalt: #FFFFFF;
+  --yolk: #FFC83D;
+  --yolk-hot: #FFD35E;
+  --yolk-deep: #D9A00F;
+  --yolk-ink: #3A2700;
+  --sun: #FFD95A;
+  --sun-soft: #FFF2C2;
+  --mint-soft: #D9F6E6;
+  --rice: #FFFFFF;
+  --ok: #17794F;
+  --font-display: "Baloo 2", "Be Vietnam Pro", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: "Playpen Sans", "Segoe Print", cursive;
+}
+/* Giao diện sáng cố định: nền trời, mặt trời vàng, men lam. */
+:root { color-scheme: light; }
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  background-image: linear-gradient(180deg, var(--sky) 0, var(--bg) 620px);
+  background-repeat: no-repeat;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1040px; margin-inline: auto; display: flex; flex-direction: column; gap: 72px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.12; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); }
+p { margin: 0; }
+.eyebrow { font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--cobalt); }
+.lead { color: var(--muted); max-width: 60ch; }
+:focus-visible { outline: 3px solid var(--yolk); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- Top bar ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; color: var(--cobalt); display: flex; align-items: center; gap: 8px; }
+.brand svg { width: 26px; height: 26px; }
+.top small { color: var(--muted); font-size: .85rem; }
+
+/* ---------- Hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 32px; align-items: center; }
+.hero-text { display: flex; flex-direction: column; gap: 20px; min-width: 0; container-type: inline-size; }
+.hero h1 { font-size: clamp(1.8rem, 7vw, 3.6rem); font-size: clamp(1.7rem, 11cqi, 4.4rem); letter-spacing: -.01em; }
+.hero h1 .l { display: block; white-space: nowrap; }
+.hero h1 em {
+  display: inline-block; white-space: nowrap; font-style: normal; color: var(--cobalt);
+  background: linear-gradient(transparent 60%, var(--sun) 60% 92%, transparent 92%);
+  padding-inline: .08em;
+}
+.hand { font-family: var(--font-hand); font-weight: 500; color: var(--muted); font-size: 1rem; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.btn {
+  appearance: none; border: 0; cursor: pointer; text-decoration: none;
+  font: 600 1rem/1 var(--font-body);
+  padding: 16px 24px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: transform .15s ease, background-color .15s ease;
+}
+.btn:active { transform: translateY(1px) scale(.99); }
+.btn-primary { background: var(--yolk); color: var(--yolk-ink); box-shadow: 0 4px 0 var(--yolk-deep); }
+.btn-primary:hover { background: var(--yolk-hot); }
+.btn-primary:active { box-shadow: 0 1px 0 var(--yolk-deep); transform: translateY(3px); }
+.btn-ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--line); }
+.btn-ghost:hover { box-shadow: inset 0 0 0 2px var(--cobalt); }
+
+.bowl-wrap { position: relative; width: 100%; max-width: 380px; margin-inline: auto; display: flex; flex-direction: column; gap: 12px; }
+.bowl-stage { position: relative; width: 100%; aspect-ratio: 320 / 260; }
+.bowl-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; }
+.bowl-stage::before {
+  content: ""; position: absolute; z-index: 0; left: 50%; top: 44%;
+  width: 86%; aspect-ratio: 1; max-width: 100%; transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sun) 0 62%, var(--sun-soft) 63% 100%);
+}
+.coin {
+  position: absolute; z-index: 0; left: 50%; top: -6%;
+  width: 34px; height: 34px; margin-left: -17px; border-radius: 50%;
+  background: var(--yolk); color: var(--yolk-ink);
+  display: grid; place-items: center;
+  font: 800 .95rem/1 var(--font-display);
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--yolk-ink) 22%, transparent);
+  opacity: 0;
+  animation: drop .95s cubic-bezier(.45, 0, .7, 1) forwards;
+}
+@keyframes drop {
+  0%   { top: -6%;  opacity: 0; transform: translateX(0) rotate(0); }
+  12%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { top: 36%; opacity: 1; transform: translateX(var(--dx, 0)) rotate(420deg); }
+}
+.steam path { animation: steam 3.2s ease-in-out infinite; }
+.steam path:nth-child(2) { animation-delay: .8s; }
+.steam path:nth-child(3) { animation-delay: 1.6s; }
+@keyframes steam { 0%, 100% { opacity: .15; } 50% { opacity: .6; } }
+.bowl-caption { text-align: center; font-family: var(--font-hand); font-weight: 500; font-size: .95rem; color: var(--muted); min-height: 3em; }
+
+/* ---------- Menu ---------- */
+.section-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.item { position: relative; display: block; cursor: pointer; min-width: 0; }
+.item.custom { grid-column: 1 / -1; }
+.item input[type="radio"] { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.card {
+  height: 100%;
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line), 0 4px 0 var(--line);
+  border-radius: 20px; padding: 18px 16px;
+  transition: box-shadow .15s ease, background-color .15s ease, transform .15s ease;
+}
+.item:hover .card { box-shadow: inset 0 0 0 2px var(--cobalt), 0 4px 0 var(--cobalt); }
+.item input:checked + .card { background: var(--cobalt-soft); box-shadow: inset 0 0 0 3px var(--cobalt), 0 4px 0 var(--cobalt); }
+.item input:focus-visible + .card { outline: 3px solid var(--yolk); outline-offset: 3px; }
+.card .name { font-weight: 600; line-height: 1.3; }
+.card .price { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--cobalt); font-variant-numeric: tabular-nums; }
+.card .note { font-size: .85rem; color: var(--muted); line-height: 1.4; }
+.custom-field { display: flex; align-items: center; gap: 6px; }
+.custom-field input {
+  position: static; opacity: 1; width: 100%; height: auto; min-width: 0;
+  font: 800 1.4rem/1.2 var(--font-display); color: var(--cobalt);
+  background: var(--bg); border: 0; border-radius: 10px; padding: 6px 10px;
+  box-shadow: inset 0 0 0 1.5px var(--line); cursor: text; font-variant-numeric: tabular-nums;
+}
+.custom-field span { font: 800 1.2rem var(--font-display); color: var(--cobalt); }
+
+/* ---------- Transfer panel ---------- */
+.panel {
+  margin-top: 20px;
+  background: var(--surface); border-radius: 24px;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  padding: 24px; display: grid; grid-template-columns: 1fr 220px; gap: 28px; align-items: start;
+}
+.panel > * { min-width: 0; }
+.rows { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px dashed var(--line); }
+.row:first-child { padding-top: 0; }
+.row:last-child { border-bottom: 0; padding-bottom: 0; }
+.row .lbl { display: block; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.row .val { display: block; font-size: 1.15rem; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.row .val.big { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--cobalt); }
+.copy {
+  flex: none; appearance: none; cursor: pointer; border: 0;
+  background: var(--cobalt-soft); color: var(--cobalt);
+  font: 600 .85rem/1 var(--font-body); padding: 10px 14px; border-radius: 999px;
+}
+.copy:hover { background: var(--cobalt); color: var(--on-cobalt); }
+.qr { display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
+.qr img { width: 100%; max-width: 220px; height: auto; display: block; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 2px var(--line), 0 4px 0 var(--line); }
+.qr p { font-size: .82rem; color: var(--muted); line-height: 1.4; }
+.sample-note {
+  margin-top: 16px; display: flex; gap: 10px; align-items: flex-start;
+  font-size: .88rem; color: var(--yolk-ink);
+  background: var(--yolk); border-radius: 14px; padding: 12px 16px;
+}
+
+/* ---------- Receipt + promises ---------- */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.split > * { min-width: 0; }
+.promises { display: flex; flex-direction: column; gap: 22px; margin-top: 24px; padding: 0; list-style: none; }
+.promises li { display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+.promises svg { width: 28px; height: 28px; color: var(--cobalt); margin-top: 2px; }
+.promises b { display: block; font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; line-height: 1.3; }
+.promises span { color: var(--muted); }
+.receipt {
+  background: var(--surface); border-radius: 6px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 0 0 1.5px var(--line);
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+.receipt::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
+  background: linear-gradient(-45deg, transparent 7px, var(--surface) 0) 0 0 / 14px 10px repeat-x,
+              linear-gradient(45deg, transparent 7px, var(--surface) 0) 0 0 / 14px 10px repeat-x;
+}
+.receipt h3 { font-size: 1.25rem; text-align: center; letter-spacing: .08em; text-transform: uppercase; }
+.receipt .meta { text-align: center; font-size: .82rem; color: var(--muted); margin: 4px 0 18px; }
+.line { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; }
+.line .dots { flex: 1; border-bottom: 2px dotted var(--line); transform: translateY(-4px); min-width: 12px; }
+.line .t { min-width: 0; }
+.line .p { font-weight: 600; white-space: nowrap; }
+.total { margin-top: 12px; padding-top: 14px; border-top: 2px dashed var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.total span { font-weight: 600; }
+.total strong { font-family: var(--font-display); font-size: 1.7rem; color: var(--cobalt); }
+.receipt .foot { margin-top: 16px; text-align: center; font-family: var(--font-hand); font-size: .9rem; color: var(--muted); }
+
+/* ---------- Help without money ---------- */
+.help { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.help > div { background: var(--cobalt-soft); border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.help h3 { font-size: 1.25rem; }
+.help > div:nth-child(1) { background: var(--sun-soft); }
+.help > div:nth-child(3) { background: var(--mint-soft); }
+.help p { color: var(--muted); font-size: .95rem; }
+.help .btn { margin-top: auto; padding: 12px 18px; font-size: .9rem; }
+
+/* ---------- FAQ ---------- */
+.faq { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+details { background: var(--surface); border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--line); padding: 4px 20px; }
+summary { cursor: pointer; font-weight: 600; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font: 800 1.4rem/1 var(--font-display); color: var(--cobalt); flex: none; }
+details[open] summary::after { content: "–"; }
+details p { color: var(--muted); padding: 0 0 16px; }
+
+/* ---------- Footer ---------- */
+footer { text-align: center; color: var(--muted); font-size: .9rem; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+footer .hand { font-size: 1.05rem; color: var(--fg); }
+footer .copyright { max-width: 62ch; margin-top: 12px; padding-top: 14px; border-top: 2px dashed var(--line); font-size: .8rem; line-height: 1.5; }
+
+/* ---------- Thank-you ---------- */
+.thanks-cta { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.thanks {
+  margin-top: 20px;
+  background: var(--sun-soft); border-radius: 24px;
+  box-shadow: inset 0 0 0 3px var(--yolk), 0 4px 0 var(--yolk-deep);
+  padding: 28px 24px; display: flex; flex-direction: column; gap: 14px;
+  animation: pop .45s cubic-bezier(.2, .9, .3, 1.2);
+}
+@keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+.thanks:focus { outline: none; }
+.thanks h3 { font-size: clamp(1.6rem, 5vw, 2.2rem); color: var(--cobalt); }
+.thanks .body { max-width: 62ch; font-size: 1.05rem; }
+.thanks .vow { max-width: 62ch; color: var(--muted); }
+.thanks .sign { font-family: var(--font-hand); font-weight: 700; color: var(--fg); }
+.thanks .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.thanks .actions .btn { padding: 12px 18px; font-size: .9rem; }
+
+/* ---------- Toast ---------- */
+.toast-wrap { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; z-index: 20; }
+.toast { background: var(--fg); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: .92rem; opacity: 0; transform: translateY(12px); transition: opacity .2s ease, transform .2s ease; max-width: 100%; }
+.toast.show { opacity: 1; transform: none; }
+
+/* ---------- Rách nhưng sạch: bìa các-tông, băng keo, miếng vá khâu chỉ ---------- */
+:root {
+  --kraft: #E8D3A8;
+  --kraft-deep: #C79F62;
+  --kraft-ink: #2A1B0A;
+  --kraft-soft: #4A3318;
+  --denim-ink: #1A3CAE;
+  --patch-rose: #FFE4DF;
+  --tear-a: polygon(0.0% 2px, 2.9% 1px, 5.9% 3px, 8.8% 6px, 11.8% 0px, 14.7% 0px, 17.6% 7px, 20.6% 4px, 23.5% 0px, 26.5% 2px, 29.4% 4px, 32.4% 0px, 35.3% 4px, 38.2% 1px, 41.2% 0px, 44.1% 0px, 47.1% 3px, 50.0% 3px, 52.9% 0px, 55.9% 1px, 58.8% 0px, 61.8% 4px, 64.7% 3px, 67.6% 0px, 70.6% 7px, 73.5% 4px, 76.5% 0px, 79.4% 1px, 82.4% 6px, 85.3% 6px, 88.2% 4px, 91.2% 0px, 94.1% 4px, 97.1% 4px, 100.0% 3px, calc(100% - 0px) 25%, calc(100% - 0px) 50%, calc(100% - 0px) 75%, 100.0% calc(100% - 4px), 97.1% calc(100% - 7px), 94.1% calc(100% - 1px), 91.2% calc(100% - 2px), 88.2% calc(100% - 3px), 85.3% calc(100% - 1px), 82.4% calc(100% - 4px), 79.4% calc(100% - 0px), 76.5% calc(100% - 4px), 73.5% calc(100% - 2px), 70.6% calc(100% - 4px), 67.6% calc(100% - 7px), 64.7% calc(100% - 6px), 61.8% calc(100% - 1px), 58.8% calc(100% - 0px), 55.9% calc(100% - 4px), 52.9% calc(100% - 4px), 50.0% calc(100% - 6px), 47.1% calc(100% - 1px), 44.1% calc(100% - 2px), 41.2% calc(100% - 0px), 38.2% calc(100% - 4px), 35.3% calc(100% - 6px), 32.4% calc(100% - 0px), 29.4% calc(100% - 4px), 26.5% calc(100% - 0px), 23.5% calc(100% - 4px), 20.6% calc(100% - 1px), 17.6% calc(100% - 3px), 14.7% calc(100% - 6px), 11.8% calc(100% - 4px), 8.8% calc(100% - 3px), 5.9% calc(100% - 7px), 2.9% calc(100% - 2px), 0.0% calc(100% - 3px), 3px 75%, 2px 50%, 2px 25%);
+  --tear-b: polygon(0.0% 1px, 3.3% 3px, 6.7% 6px, 10.0% 3px, 13.3% 6px, 16.7% 2px, 20.0% 3px, 23.3% 6px, 26.7% 1px, 30.0% 6px, 33.3% 3px, 36.7% 6px, 40.0% 4px, 43.3% 1px, 46.7% 4px, 50.0% 4px, 53.3% 1px, 56.7% 6px, 60.0% 0px, 63.3% 0px, 66.7% 2px, 70.0% 4px, 73.3% 3px, 76.7% 0px, 80.0% 1px, 83.3% 6px, 86.7% 6px, 90.0% 1px, 93.3% 1px, 96.7% 6px, 100.0% 0px, calc(100% - 2px) 25%, calc(100% - 3px) 50%, calc(100% - 2px) 75%, 100.0% calc(100% - 4px), 96.7% calc(100% - 3px), 93.3% calc(100% - 0px), 90.0% calc(100% - 2px), 86.7% calc(100% - 4px), 83.3% calc(100% - 3px), 80.0% calc(100% - 6px), 76.7% calc(100% - 0px), 73.3% calc(100% - 6px), 70.0% calc(100% - 2px), 66.7% calc(100% - 0px), 63.3% calc(100% - 1px), 60.0% calc(100% - 6px), 56.7% calc(100% - 6px), 53.3% calc(100% - 0px), 50.0% calc(100% - 0px), 46.7% calc(100% - 6px), 43.3% calc(100% - 0px), 40.0% calc(100% - 3px), 36.7% calc(100% - 1px), 33.3% calc(100% - 4px), 30.0% calc(100% - 6px), 26.7% calc(100% - 2px), 23.3% calc(100% - 3px), 20.0% calc(100% - 3px), 16.7% calc(100% - 1px), 13.3% calc(100% - 1px), 10.0% calc(100% - 6px), 6.7% calc(100% - 0px), 3.3% calc(100% - 3px), 0.0% calc(100% - 6px), 0px 75%, 0px 50%, 0px 25%);
+  --tape: polygon(0 0, 100% 0, 98% 25%, 100% 50%, 98% 75%, 100% 100%, 0 100%, 2% 75%, 0 50%, 2% 25%);
+}
+.tear { position: relative; filter: drop-shadow(0 4px 0 var(--kraft-deep)); }
+
+/* Biển các-tông ở đầu trang */
+.placard-wrap { transform: rotate(-.7deg); }
+.placard-wrap::before, .placard-wrap::after {
+  content: ""; position: absolute; top: -13px; z-index: 2; width: 104px; height: 30px;
+  background: rgba(255, 217, 90, .82); clip-path: var(--tape);
+}
+.placard-wrap::before { left: 26px; transform: rotate(-6deg); }
+.placard-wrap::after { right: 26px; transform: rotate(5deg); }
+.placard {
+  position: relative; display: flex; flex-direction: column; gap: 18px;
+  padding: 36px 28px 30px; color: var(--kraft-ink);
+  background-color: var(--kraft);
+  background-image: radial-gradient(rgba(120, 80, 20, .10) 1px, transparent 1.6px), linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(120, 80, 20, .06));
+  background-size: 7px 7px, 100% 100%;
+  clip-path: var(--tear-a);
+  container-type: inline-size;
+}
+.placard .eyebrow { color: #6B430C; }
+.placard h1 { color: var(--kraft-ink); font-size: clamp(1.7rem, 11cqi, 4.4rem); }
+.placard h1 em { color: var(--denim-ink); }
+.placard .lead { color: var(--kraft-soft); }
+.placard .hand { color: var(--kraft-soft); }
+.placard-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.stamp {
+  margin: 0; transform: rotate(-3deg);
+  font: 800 .95rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--denim-ink); padding: 8px 14px; border: 3px double var(--denim-ink); border-radius: 6px;
+  mix-blend-mode: multiply; opacity: .92;
+}
+
+/* Nhãn băng keo cho tiêu đề mục */
+.section-head .eyebrow, .split .eyebrow {
+  width: fit-content; padding: 5px 16px; background: rgba(255, 217, 90, .9); color: #3A2700;
+  transform: rotate(-1.5deg); clip-path: var(--tape);
+}
+
+/* Nút có đường chỉ khâu */
+.btn { position: relative; }
+.btn-primary::after {
+  content: ""; position: absolute; inset: 5px; border: 2px dashed rgba(58, 39, 0, .38); border-radius: 999px; pointer-events: none;
+}
+
+/* Thực đơn là những miếng vá */
+.card { position: relative; border-radius: 8px; transform: rotate(var(--rot, 0deg)) translateY(var(--lift, 0px)); }
+.card::after {
+  content: ""; position: absolute; inset: 6px; border: 2px dashed rgba(20, 39, 94, .32); border-radius: 4px; pointer-events: none;
+}
+.item:nth-child(odd) { --rot: -.8deg; }
+.item:nth-child(even) { --rot: .7deg; }
+.item:hover { --lift: -2px; }
+.item:nth-child(1) .card { background: #DCEBFF; }
+.item:nth-child(2) .card { background: var(--sun-soft); }
+.item:nth-child(3) .card { background: var(--mint-soft); }
+.item:nth-child(4) .card { background: var(--patch-rose); }
+.item.custom .card { background: var(--kraft); }
+.item.custom .card .name, .item.custom .card .note { color: var(--kraft-ink); }
+.custom-field input { position: relative; z-index: 1; }
+
+/* Bảng chuyển khoản như tờ giấy xé */
+.panel-wrap { margin-top: 20px; }
+.panel {
+  margin-top: 0; border-radius: 0; box-shadow: none; clip-path: var(--tear-b);
+  padding: 38px 28px; background: #FFFDF6;
+}
+.sample-note { border-radius: 6px; }
+
+/* Ba cách giúp mình cũng là miếng vá */
+.help > div { position: relative; border-radius: 8px; }
+.help > div::after {
+  content: ""; position: absolute; inset: 7px; border: 2px dashed rgba(20, 39, 94, .28); border-radius: 4px; pointer-events: none;
+}
+.help > div:nth-child(odd) { transform: rotate(-.6deg); }
+.help > div:nth-child(even) { transform: rotate(.5deg); }
+.help .btn { position: relative; z-index: 1; }
+
+.receipt { border-radius: 0; box-shadow: none; clip-path: var(--tear-a); padding: 40px 26px 34px; background: #FFFDF6; }
+.receipt::after { display: none; }
+details { border-radius: 10px; }
+footer .copyright { border-top-style: dotted; }
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 720px) {
+  .menu { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .item.custom { grid-column: auto; }
+}
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: 28px; }
+  .split { grid-template-columns: 1fr; gap: 40px; }
+  .help { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  body { overflow-x: clip; padding-block: 14px 40px; }
+  .wrap { gap: 44px; }
+  .hero { gap: 22px; }
+  .hero h1 .l { white-space: normal; }
+  .hero h1 em { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .placard { padding: 32px 20px 26px; gap: 14px; }
+  .placard-wrap::before, .placard-wrap::after { width: 82px; height: 24px; }
+  .cta-row { gap: 10px; }
+  .btn { min-height: 46px; padding: 14px 18px; }
+  .menu { gap: 10px; }
+  .card { padding: 16px 12px; }
+  .card .price { font-size: 1.3rem; }
+  .panel { grid-template-columns: 1fr; padding: 24px 20px; }
+  .qr { order: 0; }
+  .qr img { max-width: min(220px, 68vw); }
+  .row { gap: 8px; }
+  .row .val { font-size: 1rem; }
+  .row .val.big { font-size: 1.4rem; }
+  .copy { padding: 10px 12px; }
+  .receipt { padding: 34px 22px 30px; }
+  .top small { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coin { animation: none; display: none; }
+  .steam path { animation: none; opacity: .4; }
+  .btn, .card, .toast { transition: none; }
+}
+</style>
+<style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="description" content="Ăn xin online: bạn quét, mình no. Chọn món để mời mình một bữa, từ ly trà đá đến bữa cơm đủ đầy. Rách nhưng sạch.">
+<meta name="theme-color" content="#CDE6FF">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:title" content="Xin Một Bữa Cơm | Ăn xin online, bạn quét, mình no">
+<meta property="og:description" content="Chọn món để mời mình một bữa, từ ly trà đá đến bữa cơm đủ đầy. Rách nhưng sạch, xin lịch sự, cảm ơn chân thành.">
+<meta property="og:url" content="https://anxinonline.pages.dev/">
+<meta property="og:image" content="https://anxinonline.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Biển các-tông Ăn xin online, bạn quét, mình no, bên cạnh chiếc bát sứ sứt có miếng vá">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 14h26c0 8-5 14-13 14S3 22 3 14z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M7 14c1-5 5-8 9-8s8 3 9 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span data-cms="brand">Xin Một Bữa</span>
+    </div>
+    <small data-cms="tagline">Áo rách, lòng không rách</small>
+  </header>
+
+  <section class="hero" aria-labelledby="h-hero">
+    <div class="hero-text">
+      <div class="tear placard-wrap"><div class="placard">
+        <p class="eyebrow" data-cms="heroEyebrow">Nền tảng ăn xin online · rách nhưng sạch, nghèo nhưng lịch sự</p>
+        <h1 id="h-hero"><span class="l" data-cms="heroTitle">Ăn xin online.</span><em data-cms="heroSlogan">BẠN QUÉT - MÌNH NO, BẠN CHO - MÌNH ĐỚP :)))</em></h1>
+        <p class="lead" data-cms="heroLead">Chào bạn, mình là người đi xin. Thời đại số rồi nên mình xin bằng mã QR cho văn minh: bạn chọn món, mình ăn, ai cũng vui. Một ly trà đá thôi cũng được tính là đóng góp cho nền ẩm thực nước nhà.</p>
+        <div class="placard-foot"><p class="hand" data-cms="heroAside">— người xin ăn phiên bản 2.0, có cả wifi</p><p class="stamp" data-cms="stamp">Rách nhưng sạch</p></div>
+      </div></div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#moi" data-cms="inviteButton">Mời mình ăn</a>
+        <a class="btn btn-ghost" href="#hua" data-cms="vowButton">Mình hứa gì?</a>
+      </div>
+    </div>
+
+    <div class="bowl-wrap">
+      <div class="bowl-stage" id="stage">
+        <svg viewBox="0 0 320 260" role="img" aria-label="Chiếc bát sứ men lam đựng cơm trắng và một quả trứng ốp la">
+          <g class="steam" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round">
+            <path d="M120 38c-8-8 8-14 0-24"/>
+            <path d="M160 30c-8-8 8-14 0-24"/>
+            <path d="M200 38c-8-8 8-14 0-24"/>
+          </g>
+          <path d="M52 112C60 66 108 48 160 48s100 18 108 64z" fill="var(--rice)" stroke="var(--cobalt)" stroke-width="3.5" stroke-linejoin="round"/>
+          <g fill="var(--line)">
+            <ellipse cx="96" cy="86" rx="5" ry="2.5" transform="rotate(-25 96 86)"/>
+            <ellipse cx="124" cy="72" rx="5" ry="2.5" transform="rotate(15 124 72)"/>
+            <ellipse cx="112" cy="100" rx="5" ry="2.5" transform="rotate(35 112 100)"/>
+            <ellipse cx="228" cy="92" rx="5" ry="2.5" transform="rotate(-30 228 92)"/>
+            <ellipse cx="246" cy="104" rx="5" ry="2.5" transform="rotate(20 246 104)"/>
+          </g>
+          <path d="M162 68c4-14 26-18 40-10 14 8 12 24-4 28-12 3-20-2-30 0-8 2-10-8-6-18z" fill="#FFFFFF" stroke="var(--cobalt)" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="188" cy="72" r="9" fill="var(--yolk)"/>
+          <path d="M24 108h272c0 82-52 130-136 130S24 190 24 108z" fill="var(--surface)" stroke="var(--cobalt)" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M18 108h284" stroke="var(--cobalt)" stroke-width="9" stroke-linecap="round"/>
+          <g fill="none" stroke="var(--cobalt)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M52 150q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0"/>
+            <path d="M88 178q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0q12-18 24 0"/>
+            <path d="M112 204q12-16 24 0q12-16 24 0q12-16 24 0q12-16 24 0"/>
+          </g>
+          <path d="M118 236h84l-6 14h-72z" fill="var(--cobalt-soft)" stroke="var(--cobalt)" stroke-width="3.5" stroke-linejoin="round"/>
+          <g transform="rotate(-8 214 176)"><rect x="190" y="156" width="46" height="38" rx="4" fill="var(--sun)" stroke="var(--cobalt)" stroke-width="2.5"/><rect x="195" y="161" width="36" height="28" rx="2" fill="none" stroke="var(--cobalt)" stroke-width="2" stroke-dasharray="4 4"/></g>
+          <path d="M96 112l8 16-9 10 10 14" fill="none" stroke="var(--cobalt)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M276 108l-6 10 8 6" fill="none" stroke="var(--cobalt)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="bowl-caption" id="caption" aria-live="polite" data-cms="bowlCaption">Bát sứt một miếng, bụng cũng trống. Chọn một món bên dưới để thả đồng xu đầu tiên.</p>
+    </div>
+  </section>
+
+  <section id="moi" aria-labelledby="h-moi">
+    <div class="section-head">
+      <p class="eyebrow" data-cms="menuEyebrow">Thực đơn mời mình</p>
+      <h2 id="h-moi" data-cms="menuTitle">Bạn muốn mời mình món gì?</h2>
+      <p class="lead" data-cms="menuLead">Giá tham khảo cho một bữa bình dân ngoài phố. Chọn món nào cũng được, hoặc tự nhập số bạn thấy vui.</p>
+    </div>
+
+    <div class="menu" role="radiogroup" aria-label="Chọn món muốn mời">
+      <label class="item" data-menu-id="tea">
+        <input type="radio" name="mon" value="5000" data-menu-id="tea" data-label="Ly trà đá" data-memo="MOI MINH LY TRA DA">
+        <span class="card"><span class="name">Ly trà đá</span><span class="price">5.000đ</span><span class="note">Giải khát, giải nhiệt, giải sầu.</span></span>
+      </label>
+      <label class="item" data-menu-id="bread">
+        <input type="radio" name="mon" value="20000" data-menu-id="bread" data-label="Ổ bánh mì" data-memo="MOI MINH O BANH MI">
+        <span class="card"><span class="name">Ổ bánh mì</span><span class="price">20.000đ</span><span class="note">Có thêm chút pate là hạnh phúc.</span></span>
+      </label>
+      <label class="item" data-menu-id="pho">
+        <input type="radio" name="mon" value="50000" data-menu-id="pho" data-label="Tô phở" data-memo="MOI MINH TO PHO" checked>
+        <span class="card"><span class="name">Tô phở</span><span class="price">50.000đ</span><span class="note">Nước dùng nóng, lòng người cũng ấm.</span></span>
+      </label>
+      <label class="item" data-menu-id="meal">
+        <input type="radio" name="mon" value="100000" data-menu-id="meal" data-label="Bữa cơm đủ đầy" data-memo="MOI MINH BUA COM">
+        <span class="card"><span class="name">Bữa cơm đủ đầy</span><span class="price">100.000đ</span><span class="note">Có canh, có thịt, có rau, có nụ cười.</span></span>
+      </label>
+      <label class="item custom">
+        <input type="radio" name="mon" value="custom" data-label="Tuỳ tâm bạn" data-memo="MOI MINH AN">
+        <span class="card">
+          <span class="name" data-cms="customName">Tuỳ tâm</span>
+          <span class="custom-field"><input id="customAmount" type="number" inputmode="numeric" min="1000" step="1000" value="30000" aria-label="Số tiền tuỳ tâm, đơn vị đồng"><span>đ</span></span>
+          <span class="note" data-cms="customNote">Bao nhiêu cũng quý.</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="tear panel-wrap"><div class="panel" aria-live="polite">
+      <div class="rows">
+        <div class="row"><div><span class="lbl" data-cms="bankLabel">Ngân hàng</span><span class="val" id="bank"></span></div></div>
+        <div class="row"><div><span class="lbl" data-cms="holderLabel">Chủ tài khoản</span><span class="val" id="holder"></span></div></div>
+        <div class="row"><div><span class="lbl" data-cms="accountLabel">Số tài khoản</span><span class="val" id="account"></span></div><button class="copy" type="button" data-copy="account" data-cms="copyLabel">Sao chép</button></div>
+        <div class="row"><div><span class="lbl" data-cms="amountLabel">Số tiền</span><span class="val big" id="amount"></span></div><button class="copy" type="button" data-copy="amountRaw" data-cms="copyLabel">Sao chép</button></div>
+        <div class="row"><div><span class="lbl" data-cms="memoLabel">Nội dung chuyển khoản</span><span class="val" id="memo"></span></div><button class="copy" type="button" data-copy="memo" data-cms="copyLabel">Sao chép</button></div>
+        <span id="amountRaw" hidden></span>
+      </div>
+      <div class="qr">
+        <a id="qrLink" href="#" target="_blank" rel="noopener" aria-label="Mở mã QR chuyển khoản kích thước đầy đủ"><img id="qrImage" width="540" height="640" alt="Mã QR chuyển khoản"></a>
+        <p id="qrHint" aria-live="polite">Mã QR sẽ tự điền số tiền và nội dung chuyển khoản. Mở ứng dụng ngân hàng để quét.</p>
+      </div>
+    </div></div>
+    <p class="sample-note" id="sampleNote" data-cms="sampleMessage">Thông tin mẫu. Số tài khoản và tên bên trên chỉ là chỗ giữ chỗ. Hãy thay bằng thông tin chính chủ của bạn trước khi chia sẻ trang.</p>
+    <div class="thanks-cta">
+      <button class="btn btn-primary" type="button" id="doneBtn" aria-expanded="false" aria-controls="thanks" data-cms="paidButton">Mình vừa chuyển xong</button>
+      <span class="hand" data-cms="paidHint">Chuyển xong, bạn bấm đây để nhận lời cảm ơn nho nhỏ của mình nhé.</span>
+    </div>
+    <div class="thanks" id="thanks" tabindex="-1" hidden aria-live="polite">
+      <h3 id="thanksTitle"></h3>
+      <p class="body" id="thanksBody"></p>
+      <p class="vow" id="thanksVow"></p>
+      <p class="sign" data-cms="thanksSign">— Người xin ăn lịch sự nhất khu phố</p>
+      <div class="actions">
+        <button class="btn btn-primary" type="button" id="shareBtn2" data-cms="shareThanks">Kể cho bạn bè nghe</button>
+        <a class="btn btn-ghost" href="#moi" data-cms="revisitMenu">Xem lại thực đơn</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="hua" class="split" aria-labelledby="h-hua">
+    <div>
+      <p class="eyebrow" data-cms="vowEyebrow">Lời hứa của người đi xin</p>
+      <h2 id="h-hua" data-cms="vowTitle">Xin thì xin, nhưng mình xin có đạo đức.</h2>
+      <ul class="promises">
+        <li>
+          <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14" cy="14" r="11"/><path d="M8.5 14.5l4 4 7-8"/></svg>
+          <div><b data-cms="promise1Title">Nói thật, không vòng vo.</b><span data-cms="promise1Body">Không kể khổ quá đà, không bán hàng đa cấp. Cần một bữa ăn thì nói là cần một bữa ăn.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 24S3 17.5 3 10.5A6 6 0 0 1 14 7a6 6 0 0 1 11 3.5C25 17.5 14 24 14 24z"/></svg>
+          <div><b data-cms="promise2Title">Cảm ơn từng ly trà đá.</b><span data-cms="promise2Body">Mình đọc từng lời nhắn trong nội dung chuyển khoản và nhớ từng người.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a10 10 0 0 1 17-7l3 3"/><path d="M24 4v6h-6"/><path d="M24 14a10 10 0 0 1-17 7l-3-3"/><path d="M4 24v-6h6"/></svg>
+          <div><b data-cms="promise3Title">Có dư thì cho lại.</b><span data-cms="promise3Body">Khi khá hơn, mình mời lại một người lạ một bữa cơm. Vòng tròn tử tế cứ thế quay tiếp.</span></div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tear"><div class="receipt" aria-label="Hóa đơn niềm vui, tự cập nhật theo món bạn chọn">
+      <h3 data-cms="receiptTitle">Hóa đơn niềm vui</h3>
+      <p class="meta" data-cms="receiptMeta">Bàn: không có · Khách: người tốt bụng</p>
+      <div class="line"><span class="t" id="rItem">Tô phở</span><span class="dots"></span><span class="p" id="rPrice">50.000đ</span></div>
+      <div class="line"><span class="t" data-cms="receiptThanks">Lời cảm ơn chân thành ×1</span><span class="dots"></span><span class="p">0đ</span></div>
+      <div class="line"><span class="t" data-cms="receiptSmile">Một nụ cười hôm nay ×1</span><span class="dots"></span><span class="p">0đ</span></div>
+      <div class="line"><span class="t" data-cms="receiptGood">Cảm giác vừa làm việc tốt ×1</span><span class="dots"></span><span class="p">0đ</span></div>
+      <div class="total"><span data-cms="receiptTotal">Bạn trả</span><strong id="rTotal">50.000đ</strong></div>
+      <p class="foot" data-cms="receiptFoot">Không cần xuất hóa đơn đỏ, mình nhớ ơn bạn rồi.</p>
+    </div></div>
+  </section>
+
+  <section aria-labelledby="h-help">
+    <div class="section-head">
+      <p class="eyebrow" data-cms="helpEyebrow">Chưa tiện chuyển khoản?</p>
+      <h2 id="h-help" data-cms="helpTitle">Vẫn có ba cách giúp mình.</h2>
+    </div>
+    <div class="help">
+      <div>
+        <h3 data-cms="help1Title">Chia sẻ trang này</h3>
+        <p data-cms="help1Body">Gửi cho một người bạn hay cười, hoặc người từng bị mình xin cơm rồi.</p>
+        <button class="btn btn-primary" type="button" id="shareBtn" data-cms="shareButton">Sao chép đường dẫn</button>
+      </div>
+      <div>
+        <h3 data-cms="help2Title">Gửi một lời chúc</h3>
+        <p data-cms="help2Body">Nhắn mình vài chữ động viên. Chữ không tốn tiền nhưng no lòng lâu.</p>
+      </div>
+      <div>
+        <h3 data-cms="help3Title">Giới thiệu việc làm</h3>
+        <p data-cms="help3Body">Có chỗ nào cần người chăm chỉ, nhớ nhắn mình. Xin cần câu còn quý hơn xin cá.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-faq">
+    <div class="section-head">
+      <p class="eyebrow" data-cms="faqEyebrow">Hỏi nhanh đáp gọn</p>
+      <h2 id="h-faq" data-cms="faqTitle">Bạn đang nghĩ gì, mình biết hết.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary data-cms="faq1Question">Đây có phải trò lừa đảo không?</summary>
+        <p data-cms="faq1Answer">Không hứa lãi, không bán gì, không ép ai. Bạn chỉ chuyển khi thấy muốn. Tên chủ tài khoản hiện ngay phía trên để bạn đối chiếu trước khi gửi.</p>
+      </details>
+      <details>
+        <summary data-cms="faq2Question">Mình nên chuyển bao nhiêu?</summary>
+        <p data-cms="faq2Answer">Bao nhiêu cũng được. Một ly trà đá cũng là một lời động viên. Đừng chuyển số khiến bạn phải thắt lưng buộc bụng.</p>
+      </details>
+      <details>
+        <summary data-cms="faq3Question">Chuyển xong có cần báo không?</summary>
+        <p data-cms="faq3Answer">Không cần. Nhưng nếu bạn để lại vài chữ trong nội dung chuyển khoản, mình sẽ đọc và cười một mình.</p>
+      </details>
+      <details>
+        <summary data-cms="faq4Question">Mình không muốn cho tiền thì sao?</summary>
+        <p data-cms="faq4Answer">Hoàn toàn ổn. Bạn ghé thăm, đọc đến đây và mỉm cười là mình đã vui rồi.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer>
+    <p class="hand" data-cms="footerNote">Cảm ơn bạn đã ghé qua. Chúc bạn hôm nay ăn ngon.</p>
+    <p data-cms="footerLine">Áo có thể rách, lời cảm ơn thì luôn lành lặn.</p>
+    <p class="copyright" data-cms="copyright">© 2026 Chu Anh Phuong. Bảo lưu mọi quyền. Lời văn, hình minh họa và bố cục của trang này thuộc về chủ trang. Vui lòng không sao chép hoặc dùng lại cho mục đích thương mại khi chưa được đồng ý. Chia sẻ đường dẫn thì luôn được hoan nghênh.</p>
+  </footer>
+</div>
+
+<div class="toast-wrap"><div class="toast" id="toast" role="status" aria-live="polite"></div></div>
+
+<script>
+/* Thông tin nhận tiền. */
+const CONFIG = {
+  bank: 'Techcombank',
+  bankBin: '970407',
+  holder: 'TRAN HIEP CUONG',
+  account: '19037212453015',
+  sample: false
+};
+let pageContent = null;
+
+const $ = (id) => document.getElementById(id);
+const money = (n) => n.toLocaleString('vi-VN') + 'đ';
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+$('bank').textContent = CONFIG.bank;
+$('holder').textContent = CONFIG.holder;
+$('account').textContent = CONFIG.account;
+$('sampleNote').hidden = !CONFIG.sample;
+
+const custom = $('customAmount');
+let radios = Array.from(document.querySelectorAll('input[name="mon"]'));
+
+function bindMenuEvents() {
+  radios.forEach((radio) => radio.addEventListener('change', onChoose));
+}
+
+function rebuildMenu(items) {
+  const menu = document.querySelector('.menu');
+  const customItem = menu.querySelector('.item.custom');
+  const selectedId = radios.find((radio) => radio.checked && radio.value !== 'custom')?.dataset.menuId;
+  menu.querySelectorAll('.item:not(.custom)').forEach((item) => item.remove());
+  for (const item of items) {
+    const label = document.createElement('label');
+    label.className = 'item';
+    label.dataset.menuId = item.id;
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'mon';
+    radio.value = String(item.amount);
+    radio.dataset.label = item.name;
+    radio.dataset.memo = item.memo;
+    radio.dataset.menuId = item.id;
+    const card = document.createElement('span');
+    card.className = 'card';
+    for (const [className, value] of [['name', item.name], ['price', money(Number(item.amount))], ['note', item.note]]) {
+      const span = document.createElement('span');
+      span.className = className;
+      span.textContent = value;
+      card.appendChild(span);
+    }
+    label.append(radio, card);
+    menu.insertBefore(label, customItem);
+    radio.checked = item.id === selectedId || (!selectedId && item === items[0]);
+  }
+  const menuRadios = Array.from(menu.querySelectorAll('.item:not(.custom) input[name="mon"]'));
+  if (!menuRadios.some((radio) => radio.checked) && menuRadios[0]) menuRadios[0].checked = true;
+  customItem.querySelector('input[name="mon"]').dataset.label = document.querySelector('[data-cms="customName"]').textContent + ' bạn';
+  customItem.querySelector('input[name="mon"]').dataset.memo = pageContent?.customMemo || 'MOI MINH AN';
+  radios = Array.from(menu.querySelectorAll('input[name="mon"]'));
+  bindMenuEvents();
+}
+
+function applyPageContent(content) {
+  if (!content || !content.recipient || !Array.isArray(content.menu) || !content.text) return;
+  pageContent = content;
+  CONFIG.bank = content.recipient.bankName;
+  CONFIG.bankBin = content.recipient.bankBin;
+  CONFIG.holder = content.recipient.accountName;
+  CONFIG.account = content.recipient.accountNo;
+  CONFIG.sample = content.showSampleNotice;
+  $('bank').textContent = CONFIG.bank;
+  $('holder').textContent = CONFIG.holder;
+  $('account').textContent = CONFIG.account;
+  $('sampleNote').hidden = !CONFIG.sample;
+  for (const element of document.querySelectorAll('[data-cms]')) {
+    const value = content.text[element.dataset.cms];
+    if (typeof value === 'string') element.textContent = value;
+  }
+  document.title = content.text.siteTitle;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', content.text.metaDescription);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', content.text.siteTitle);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', content.text.metaDescription);
+  custom.value = content.customAmount;
+  custom.min = '1000';
+  custom.step = '1000';
+  custom.setAttribute('aria-label', `${content.text.customName}, đơn vị đồng`);
+  rebuildMenu(content.menu);
+  const customRadio = document.querySelector('.item.custom input[name="mon"]');
+  customRadio.dataset.label = `${content.text.customName} bạn`;
+  customRadio.dataset.memo = content.customMemo;
+  const thanksFields = [
+    ['thanks100Title', 'thanks100Body', 'thanks100Vow'],
+    ['thanks50Title', 'thanks50Body', 'thanks50Vow'],
+    ['thanks20Title', 'thanks20Body', 'thanks20Vow'],
+    ['thanks1Title', 'thanks1Body', 'thanks1Vow']
+  ];
+  thanksFields.forEach(([title, body, vow], index) => {
+    THANKS[index].title = content.text[title];
+    THANKS[index].body = (amount) => content.text[body].replaceAll('{amount}', amount);
+    THANKS[index].vow = content.text[vow];
+  });
+  render();
+}
+
+function current() {
+  const r = radios.find((x) => x.checked);
+  let amount = r.value === 'custom' ? parseInt(custom.value, 10) || 0 : Number(r.value);
+  return { label: r.dataset.label, memo: r.dataset.memo, amount, isCustom: r.value === 'custom' };
+}
+
+function render() {
+  const c = current();
+  const ok = c.amount >= 1000;
+  const shown = ok ? money(c.amount) : 'Từ 1.000đ';
+  $('amount').textContent = shown;
+  $('amountRaw').textContent = ok ? String(c.amount) : '';
+  $('memo').textContent = c.memo;
+  $('rItem').textContent = c.label;
+  $('rPrice').textContent = ok ? shown : '0đ';
+  $('rTotal').textContent = ok ? shown : '0đ';
+  updateQr(c, ok);
+  return { c, ok };
+}
+
+function updateQr(choice, isValid) {
+  const image = $('qrImage');
+  const link = $('qrLink');
+  const hint = $('qrHint');
+  if (!isValid) {
+    image.hidden = true;
+    link.removeAttribute('href');
+    hint.textContent = 'Nhập số tiền từ 1.000đ trở lên để tạo mã QR chuyển khoản.';
+    return;
+  }
+
+  const params = new URLSearchParams({
+    amount: String(choice.amount),
+    addInfo: choice.memo,
+    accountName: CONFIG.holder
+  });
+  const qrUrl = `https://img.vietqr.io/image/${CONFIG.bankBin}-${CONFIG.account}-compact2.png?${params}`;
+  image.onerror = () => {
+    if (image.src === qrUrl) {
+      image.hidden = true;
+      hint.textContent = 'Chưa tải được mã QR. Bạn vẫn có thể dùng thông tin tài khoản và nút sao chép bên cạnh.';
+    }
+  };
+  image.src = qrUrl;
+  image.alt = `Mã QR ${CONFIG.bank} chuyển ${money(choice.amount)} với nội dung ${choice.memo} đến ${CONFIG.holder}`;
+  image.hidden = false;
+  link.href = qrUrl;
+  hint.textContent = `Quét mã để chuyển ${money(choice.amount)} với nội dung “${choice.memo}”.`;
+}
+
+function dropCoins(amount) {
+  if (reduceMotion) return;
+  const n = amount >= 100000 ? 4 : amount >= 50000 ? 3 : amount >= 20000 ? 2 : 1;
+  const stage = $('stage');
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('span');
+    el.className = 'coin';
+    el.textContent = '₫';
+    el.style.setProperty('--dx', (Math.random() * 60 - 30).toFixed(0) + 'px');
+    el.style.animationDelay = (i * 150) + 'ms';
+    el.addEventListener('animationend', () => el.remove());
+    stage.appendChild(el);
+  }
+}
+
+function onChoose() {
+  const { c, ok } = render();
+  if (!ok) return;
+  $('caption').textContent = c.label + ' · ' + money(c.amount) + '. Cảm ơn bạn nhiều lắm!';
+  dropCoins(c.amount);
+}
+
+bindMenuEvents();
+custom.addEventListener('input', () => {
+  radios.find((x) => x.value === 'custom').checked = true;
+  onChoose();
+});
+render();
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function selectText(el) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+async function copyText(text, el, okMsg) {
+    try {
+    await navigator.clipboard.writeText(text);
+    toast(okMsg);
+  } catch (e) {
+    if (el) selectText(el);
+    toast('Đã chọn sẵn, bạn bấm Ctrl/Cmd + C để chép nhé');
+  }
+}
+
+document.querySelectorAll('.copy').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const src = $(btn.dataset.copy);
+    const text = (src.textContent || '').trim();
+    if (!text) { toast('Bạn nhập số tiền từ 1.000đ trở lên nhé'); return; }
+    const raw = btn.dataset.copy === 'account' ? text.replace(/\s/g, '') : text;
+    const old = btn.textContent;
+    copyText(raw, src, pageContent?.text.copySuccess || 'Đã sao chép');
+    btn.textContent = pageContent?.text.copySuccess || 'Đã chép';
+    setTimeout(() => { btn.textContent = pageContent?.text.copyLabel || old; }, 1600);
+  });
+});
+
+function shareLink() {
+  copyText(window.location.href.split('#')[0], null, 'Đã sao chép đường dẫn. Cảm ơn bạn đã lan tỏa!');
+}
+$('shareBtn').addEventListener('click', shareLink);
+$('shareBtn2').addEventListener('click', shareLink);
+
+/* Lời cảm ơn theo từng mức, giọng người đi xin. */
+const THANKS = [
+  {
+    min: 100000,
+    title: 'Cảm ơn bạn, bữa nay có canh có thịt rồi!',
+    body: (a) => 'Bạn vừa mời mình ' + a + ', đủ cho một bữa cơm tử tế. Mình xin phép ăn thật ngon để không phụ tấm lòng của bạn.',
+    vow: 'Mình hứa ăn đủ rau, nhớ uống nước, và kể lại bữa cơm này như một câu chuyện đẹp.'
+  },
+  {
+    min: 50000,
+    title: 'Tô phở này ấm cả bụng lẫn lòng!',
+    body: (a) => 'Cảm ơn bạn đã mời mình ' + a + '. Nước dùng thơm, bánh phở mềm, còn lòng tốt của bạn thì thơm hơn cả hành phi.',
+    vow: 'Mình hứa húp hết nước dùng và gửi lời cảm ơn đến bạn trong từng thìa.'
+  },
+  {
+    min: 20000,
+    title: 'Ổ bánh mì giòn, tấm lòng còn giòn hơn!',
+    body: (a) => 'Cảm ơn bạn đã mời mình ' + a + '. Bụng mình vừa khẽ nói "cảm ơn", mình xin phép nói to thay nó.',
+    vow: 'Mình hứa ăn từ tốn, không làm rơi vụn nào, vì vụn bánh nào cũng mang theo thiện ý của bạn.'
+  },
+  {
+    min: 1000,
+    title: 'Ly trà đá mát lành, cảm ơn bạn nhiều!',
+    body: (a) => 'Cảm ơn bạn đã mời mình ' + a + '. Nhỏ thôi nhưng đúng lúc, như cơn gió chiều giữa buổi trưa nắng.',
+    vow: 'Mình hứa uống từng ngụm thật chậm và nhớ rằng thế giới này vẫn còn nhiều người dễ thương.'
+  }
+];
+
+$('doneBtn').addEventListener('click', () => {
+  const { c, ok } = render();
+  const amount = ok ? c.amount : 0;
+  const tier = THANKS.find((t) => amount >= t.min) || THANKS[THANKS.length - 1];
+  const shown = ok ? money(amount) : 'một chút lòng tốt';
+  /* amount < 1000 dùng mức nhỏ nhất */
+  $('thanksTitle').textContent = tier.title;
+  $('thanksBody').textContent = tier.body(shown);
+  $('thanksVow').textContent = tier.vow;
+  const box = $('thanks');
+  box.hidden = false;
+  $('doneBtn').setAttribute('aria-expanded', 'true');
+  $('caption').textContent = 'Đồng xu của bạn đã vào bát. Mình xin chân thành cảm ơn!';
+  dropCoins(Math.max(amount, 50000));
+  box.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  box.focus({ preventScroll: true });
+});
+
+fetch('api/content', { headers: { Accept: 'application/json' } })
+  .then((response) => response.ok ? response.json() : null)
+  .then((content) => { if (content) applyPageContent(content); })
+  .catch(() => {});
+</script>
+</body>
+</html>
