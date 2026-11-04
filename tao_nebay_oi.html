@@ -35,7 +35,7 @@
       <div class="grid" style="margin-top:20px"><div class="field"><label for="customAmount">Số tiền tùy tâm mặc định (đồng)</label><input id="customAmount" type="number" min="1000" step="1000" required></div><div class="field"><label for="customMemo">Nội dung chuyển khoản cho tùy tâm</label><input id="customMemo" maxlength="50" required></div></div>
     </div>
     <div class="card"><h2>Nội dung trên trang chính</h2><p>Các trường dưới đây cập nhật nội dung hiển thị, tiêu đề trang và thông tin chia sẻ.</p><div id="textFields" class="grid"></div></div>
-    <div class="card"><label class="check"><input id="showSampleNotice" type="checkbox"><span>Hiện thông báo nhắc kiểm tra thông tin tài khoản mẫu</span></label><p class="hint">Tắt nếu đây là tài khoản chính chủ và bạn đã xác nhận nội dung.</p></div>
+    <div class="card"><label class="check"><input id="showSampleNotice" type="checkbox"><span>Hiện thông báo nhắc kiểm tra thông tin tài khoản mẫu</span></label><p class="hint">Tắt nếu đây là tài khoản chính chủ và bạn đã xác nhận nội dung.</p><label class="check"><input id="showFooter" type="checkbox"><span>Hiện phần nội dung chân trang</span></label><p class="hint">Bỏ chọn để ẩn toàn bộ nội dung ở cuối trang chính.</p></div>
     <div class="sticky"><div><strong>Lưu thay đổi</strong><div id="saveStatus" class="status" role="status" aria-live="polite">Chưa lưu thay đổi</div></div><div class="actions"><button id="logout" class="button secondary" type="button">Đăng xuất</button><button id="save" class="button" type="button">Lưu và cập nhật trang</button></div></div>
   </section>
 </main>
@@ -82,7 +82,7 @@ function addMenuItem(item={id:`mon-${Date.now()}-${++itemNumber}`,name:'',amount
 function populate(data) {
   current=data;
   for(const [id,value] of Object.entries(data.recipient)) $(id).value=value;
-  $('customAmount').value=data.customAmount;$('customMemo').value=data.customMemo;$('showSampleNotice').checked=data.showSampleNotice;
+  $('customAmount').value=data.customAmount;$('customMemo').value=data.customMemo;$('showSampleNotice').checked=data.showSampleNotice;$('showFooter').checked=data.showFooter!==false;
   $('menuItems').replaceChildren();data.menu.forEach(addMenuItem);renderTextFields(data.text);
 }
 async function api(path, options={}) {
@@ -99,7 +99,7 @@ async function loadEditor() {
 function collect() {
   const text={};document.querySelectorAll('#textFields [data-key]').forEach(input=>text[input.dataset.key]=input.value.trim());
   const menu=Array.from(document.querySelectorAll('[data-menu-item]')).map(card=>({id:card.querySelector('[data-menu-id]').value,name:card.querySelector('[data-menu-field="name"]').value.trim(),amount:Number(card.querySelector('[data-menu-field="amount"]').value),note:card.querySelector('[data-menu-field="note"]').value.trim(),memo:card.querySelector('[data-menu-field="memo"]').value.trim()}));
-  return {recipient:{bankName:$('bankName').value.trim(),bankBin:$('bankBin').value.trim(),accountName:$('accountName').value.trim(),accountNo:$('accountNo').value.trim()},customAmount:Number($('customAmount').value),customMemo:$('customMemo').value.trim(),showSampleNotice:$('showSampleNotice').checked,menu,text};
+  return {recipient:{bankName:$('bankName').value.trim(),bankBin:$('bankBin').value.trim(),accountName:$('accountName').value.trim(),accountNo:$('accountNo').value.trim()},customAmount:Number($('customAmount').value),customMemo:$('customMemo').value.trim(),showSampleNotice:$('showSampleNotice').checked,showFooter:$('showFooter').checked,menu,text};
 }
 function validateLocalContent(data) {
   if(!data.recipient.bankName||!data.recipient.accountName||!/^[0-9]{6}$/.test(data.recipient.bankBin)||!/^[A-Za-z0-9]{4,19}$/.test(data.recipient.accountNo))return 'Kiểm tra lại ngân hàng, mã BIN, tên người nhận và số tài khoản.';

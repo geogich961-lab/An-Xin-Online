@@ -228,6 +228,7 @@ details p { color: var(--muted); padding: 0 0 16px; }
 
 /* ---------- Footer ---------- */
 footer { text-align: center; color: var(--muted); font-size: .9rem; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+footer[hidden] { display: none !important; }
 footer .hand { font-size: 1.05rem; color: var(--fg); }
 footer .copyright { max-width: 62ch; margin-top: 12px; padding-top: 14px; border-top: 2px dashed var(--line); font-size: .8rem; line-height: 1.5; }
 
@@ -689,6 +690,7 @@ function applyPageContent(content) {
   $('holder').textContent = CONFIG.holder;
   $('account').textContent = CONFIG.account;
   $('sampleNote').hidden = !CONFIG.sample;
+  document.querySelector('footer').hidden = content.showFooter === false;
   for (const element of document.querySelectorAll('[data-cms]')) {
     const value = content.text[element.dataset.cms];
     if (typeof value === 'string') element.textContent = value;

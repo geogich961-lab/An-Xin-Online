@@ -8,6 +8,7 @@ window.ANXIN_DEFAULT_CONTENT = {
   customAmount: 30000,
   customMemo: 'MOI MINH AN',
   showSampleNotice: false,
+  showFooter: true,
   menu: [
     { id: 'tea', name: 'Ly trà đá', amount: 5000, note: 'Giải khát, giải nhiệt, giải sầu.', memo: 'MOI MINH LY TRA DA' },
     { id: 'bread', name: 'Ổ bánh mì', amount: 20000, note: 'Có thêm chút pate là hạnh phúc.', memo: 'MOI MINH O BANH MI' },
